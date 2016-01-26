@@ -34,13 +34,12 @@ public class PlotterView extends View {
 
         mFreqPaint = new Paint();
         mFreqPaint.setStrokeWidth(POINT_WIDTH);
-        //mFreqPaint.setColor(0xffff3333); // 0x22ff0000 - Transparent RED
         mFreqPaint.setColor(Color.CYAN);
         mAxisPaint = new Paint();
         mAxisPaint.setStrokeWidth(5);
         mAxisPaint.setColor(Color.LTGRAY);
         mBackgroundPaint = new Paint();
-        mBackgroundPaint.setColor(Color.DKGRAY); // 0xfff8efe0 - Off White
+        mBackgroundPaint.setColor(Color.DKGRAY);
     }
 
     @Override
