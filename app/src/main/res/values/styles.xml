@@ -1,8 +1,36 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <!--style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"-->
         <!-- Customize your theme here. -->
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">#ff960000</item>
+        <item name="android:textColorPrimary">#ff960000</item>
+        <item name="android:colorPrimaryDark">#ff860000</item>
+    </style>
+
+    <style name="VoiceCoachOptionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">#ff960000</item>
+        <item name="android:background">@drawable/option_button</item>
+    </style>
+
+    <style name="VoiceCoachSwaramButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:textColor">#fffac090</item>
+        <item name="android:background">@drawable/red_metal_border</item>
     </style>
 
 </resources>

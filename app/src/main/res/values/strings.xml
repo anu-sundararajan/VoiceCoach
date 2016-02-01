@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">VoiceCoach</string>
-
-    <string name="voice_coach">Voice Coach</string>
+    <string name="app_name">Voice Coach</string>
     <string name="action_settings">Settings</string>
 </resources>

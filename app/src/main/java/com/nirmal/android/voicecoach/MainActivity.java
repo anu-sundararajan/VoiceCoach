@@ -1,17 +1,21 @@
 package com.nirmal.android.voicecoach;
 
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -57,11 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             new Ragam("Kalyani",          new boolean[] {true, false, true, false, true, false, true, true, false, true, false, true}, new boolean[] {true, false, true, false, true, false, true, true, false, true, false, true})
     };
 */
-    Button startButton;
-    Button stopButton;
-    Button pitchButton;
-    Button ragamButton;
-    Button seqButton;
+    Button mStartStopButton;
     EditText mThalamEditText;
     TextView mFrequencyTextView;
     PlotterView mFrequencyPlotterView;
@@ -75,16 +75,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button mNiButton;
     Button mHSaButton;
 
+    MenuItem mRagamItem;
+    MenuItem mPitchItem;
+    MenuItem mSeqItem;
+
     int sampleRateInHz = 44100; //11025;
     int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-    boolean isRecording = false;
+    boolean mIsRecording = false;
     RecordAudio recordTask;
     List<Ragam> mRagamList = new ArrayList<>();
     List<String> mRagamNames = new ArrayList<>();
     int mRagamIndex = 0;
     int mSequenceMode = 0;
     int mNumSamples = 1;
+    int mPitch = 0;
 
     private void populateRagams() {
         mRagamList.add(new Ragam("Mayamalava Gowla", new boolean[] {true, true, false, false, true, true, false, true, true, false, false, true, true}, new boolean[] {true, true, false, false, true, true, false, true, true, false, false, true, true}));
@@ -99,19 +104,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+            actionBar.setIcon(R.mipmap.ic_launcher);
+            Drawable d = ContextCompat.getDrawable(this, R.drawable.light_gold);
+            actionBar.setBackgroundDrawable(d);
+            actionBar.setTitle("  " + "Voice Coach");
+        }
         setContentView(R.layout.activity_main);
+
         mFrequencyTextView = (TextView)this.findViewById(R.id.text_view_frequency);
-        startButton = (Button)this.findViewById(R.id.StartButton);
-        startButton.setOnClickListener(this);
-        stopButton = (Button)this.findViewById(R.id.StopButton);
-        stopButton.setOnClickListener(this);
-        stopButton.setEnabled(false);
-        pitchButton = (Button)this.findViewById(R.id.PitchButton);
-        pitchButton.setOnClickListener(this);
-        ragamButton = (Button)this.findViewById(R.id.RagamButton);
-        ragamButton.setOnClickListener(this);
-        seqButton = (Button)this.findViewById(R.id.SeqButton);
-        seqButton.setOnClickListener(this);
+        mStartStopButton = (Button)this.findViewById(R.id.StartStopButton);
+        mStartStopButton.setOnClickListener(this);
         mThalamEditText = (EditText)this.findViewById(R.id.ThalamEditText);
 
         mLSaButton = (Button)this.findViewById(R.id.LSaButton);
@@ -131,67 +136,108 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHSaButton = (Button)this.findViewById(R.id.HSaButton);
         mHSaButton.setOnClickListener(this);
 
-
         mFrequencyPlotterView = (PlotterView)this.findViewById(R.id.plotter_view_frequency);
         mNumSamples = AudioRecord.getMinBufferSize(sampleRateInHz,
                 channelConfiguration, audioEncoding);
 
         populateRagams();
 
+        mPitch = 0;
+        mIsRecording = false;
+
         if (mSequenceMode == 0) {
             mFrequencyPlotterView.drawReferenceLine(0);
         } else {
             mFrequencyPlotterView.drawAllReferenceLines(mRagamList.get(mRagamIndex).getArohanam());
         }
-
     }
 
     public void onClick(View v) {
-        if (v == startButton) {
-            startButton.setEnabled(false);
-            stopButton.setEnabled(true);
-            ragamButton.setEnabled(false);
-            pitchButton.setEnabled(false);
-            seqButton.setEnabled(false);
-            mThalamEditText.setEnabled(false);
-            int ms_per_beat = 1000;
-            try {
-                ms_per_beat = Integer.parseInt(mThalamEditText.getText().toString());
-            } catch (Exception e) {
-                ms_per_beat = 1000;
-                Log.e(TAG, "NumberFormatException  - MS PER BEAT");
-                mThalamEditText.setText("1000");
-            }
-            recordTask = new RecordAudio();
-            recordTask.execute();
-            if (mSequenceMode != 0) {
-                int sampletime = (1000 * mNumSamples) / sampleRateInHz;
-                int swarakalam = ms_per_beat / sampletime;
-                Log.i(TAG, "ms_per_beat = " + ms_per_beat + "mNumSamples = " + mNumSamples + " Swarakalam = " + swarakalam);
-                        mFrequencyPlotterView.startReferenceStair(mSequenceMode, swarakalam);
-            }
+        if (v == mStartStopButton) {
+            mIsRecording = !mIsRecording;
+            setEnabled_ButtonsAndMenu(!mIsRecording);
+            if (mIsRecording)
+                startRecording();
+            else stopRecording();
+            return;
         }
-        if (v == stopButton) {
-            ragamButton.setEnabled(true);
-            pitchButton.setEnabled(true);
-            seqButton.setEnabled(true);
-            mThalamEditText.setEnabled(true);
-            isRecording = false;
-            mFrequencyPlotterView.stopReferenceStair();
+
+        Ragam r = mRagamList.get(mRagamIndex);
+        if (v == mLSaButton) {
+            mFrequencyPlotterView.drawReferenceLine(0);
         }
-        if (v == pitchButton) {
+        if (v == mRiButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getRiIndex());
+        }
+        if (v == mGaButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getGaIndex());
+        }
+        if (v == mMaButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getMaIndex());
+        }
+        if (v == mPaButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getPaIndex());
+        }
+        if (v == mDaButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getDaIndex());
+        }
+        if (v == mNiButton) {
+            mFrequencyPlotterView.drawReferenceLine(r.getNiIndex());
+        }
+        if (v == mHSaButton) {
+            mFrequencyPlotterView.drawReferenceLine(Ragam.MAX_NOTES-1);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        mPitchItem = menu.findItem(R.id.menu_item_pitch);
+        mPitchItem.setTitle(PITCHES[mPitch]);
+        mRagamItem = menu.findItem(R.id.menu_item_ragam);
+        mRagamItem.setTitle(mRagamNames.get(mRagamIndex));
+        mSeqItem = menu.findItem(R.id.menu_item_seq);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        mRagamItem.setEnabled(!mIsRecording);
+        mPitchItem.setEnabled(!mIsRecording);
+        mSeqItem.setEnabled(!mIsRecording);
+        super.onPrepareOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (id == R.id.menu_item_pitch) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Pitch");
             builder.setItems(PITCHES, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    mPitch = which;
                     mFrequencyPlotterView.setPitch(which);
+                    invalidateOptionsMenu();
                 }
             });
             builder.show();
+            return true;
         }
-        if (v == ragamButton) {
 
+        if (id == R.id.menu_item_ragam) {
             final CharSequence[] ragamNames = mRagamNames.toArray(new CharSequence[mRagamNames.size()]);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -203,11 +249,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.i(TAG, "User selected ragam " + which);
                     mRagamIndex = which;
                     mFrequencyPlotterView.drawReferenceLine(0);
+                    invalidateOptionsMenu();
                 }
             });
             builder.show();
+            return true;
         }
-        if (v == seqButton) {
+
+        if (id == R.id.menu_item_seq) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select Sequence");
             builder.setItems(SEQ_OPTIONS, new DialogInterface.OnClickListener() {
@@ -225,60 +274,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
             builder.show();
-        }
-
-        if (v == mLSaButton) {
-            mFrequencyPlotterView.drawReferenceLine(0);
-        }
-        if (v == mRiButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getRiIndex());
-        }
-        if (v == mGaButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getGaIndex());
-        }
-        if (v == mMaButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getMaIndex());
-        }
-        if (v == mPaButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getPaIndex());
-        }
-        if (v == mDaButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getDaIndex());
-        }
-        if (v == mNiButton) {
-            Ragam r = mRagamList.get(mRagamIndex);
-            mFrequencyPlotterView.drawReferenceLine(r.getNiIndex());
-        }
-        if (v == mHSaButton) {
-            mFrequencyPlotterView.drawReferenceLine(Ragam.MAX_NOTES-1);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startRecording() {
+        int ms_per_beat = 1000;
+        try {
+            ms_per_beat = Integer.parseInt(mThalamEditText.getText().toString());
+        } catch (Exception e) {
+            ms_per_beat = 1000;
+            Log.e(TAG, "NumberFormatException  - MS PER BEAT");
+            mThalamEditText.setText("1000");
+        }
+
+        recordTask = new RecordAudio();
+        recordTask.execute();
+        if (mSequenceMode != 0) {
+            int sampletime = (1000 * mNumSamples) / sampleRateInHz;
+            int swarakalam = ms_per_beat / sampletime;
+            Log.i(TAG, "ms_per_beat = " + ms_per_beat + "mNumSamples = " + mNumSamples + " Swarakalam = " + swarakalam);
+            mFrequencyPlotterView.startReferenceStair(mSequenceMode, swarakalam);
+        }
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        mStartStopButton.setText("Stop");
+    }
+
+    private void stopRecording() {
+        mFrequencyPlotterView.stopReferenceStair();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        mStartStopButton.setText("Start");
+    }
+
+    private void setEnabled_ButtonsAndMenu(boolean enable) {
+        mThalamEditText.setEnabled(enable);
+        invalidateOptionsMenu();
     }
 
     private class RecordAudio extends AsyncTask<Void, Integer, Void> {
@@ -286,7 +319,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Void doInBackground(Void... params) {
             Integer frequency = 0;
-            isRecording = true;
             try {
                 AudioRecord audioRecord = new AudioRecord(
                         MediaRecorder.AudioSource.MIC, sampleRateInHz,
@@ -295,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 short[] buffer = new short[mNumSamples];
                 audioRecord.startRecording();
 
-                while (isRecording) {
+                while (mIsRecording) {
                     int bufferReadResult = audioRecord.read(buffer, 0, mNumSamples);
                     frequency = FrequencyDetector_ZeroCrossing.calculateFrequency(sampleRateInHz, buffer);
                     //Log.i(TAG, "numsamples = " + buffer.length);
@@ -309,8 +341,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return null;
         }
 
-
-
         @Override
         protected void onProgressUpdate(Integer... frequencies) {
             mFrequencyTextView.setText(frequencies[0].toString());
@@ -318,10 +348,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            startButton.setEnabled(true);
-            stopButton.setEnabled(false);
-        }
+        protected void onPostExecute(Void result) {}
+
     }
 }
 

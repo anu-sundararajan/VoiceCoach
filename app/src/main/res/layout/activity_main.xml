@@ -5,68 +5,56 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:background="@drawable/maroon_gradient"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:orientation="vertical"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
             android:text="Start"
-            android:id="@+id/StartButton"/>
+            style="@style/VoiceCoachOptionButton"
+            android:id="@+id/StartStopButton"/>
 
-        <Button
-            android:layout_width="wrap_content"
+        <TextView
+            android:text="Thalam"
+            android:textColor="#FFEFD090"
+            android:gravity="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="Stop"
-            android:id="@+id/StopButton"/>
+            android:paddingTop="10dp"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="Pitch"
-            android:id="@+id/PitchButton"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="Ragam"
-            android:id="@+id/RagamButton"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="Seq"
-            android:id="@+id/SeqButton"/>
+        <TextView
+            android:text="(ms per beat)"
+            android:textSize="10dp"
+            android:textColor="#FFEFD090"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <EditText
             android:id="@+id/ThalamEditText"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="1000"
+            android:textColor="#FFEFD090"
+            android:cursorVisible="false"
+            android:backgroundTint="#FFEFD090"
             android:inputType="number" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:drawableTop="@android:drawable/ic_media_play"
-            android:id="@+id/AudioButton"/>
 
         <TextView
             android:id="@+id/text_view_frequency"
-            android:layout_width="wrap_content"
+            android:textColor="#FFEFD090"
+            android:gravity="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -75,90 +63,42 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="S"
             android:id="@+id/HSaButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="N"
             android:id="@+id/NiButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="D"
             android:id="@+id/DaButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="P"
             android:id="@+id/PaButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="M"
             android:id="@+id/MaButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="G"
             android:id="@+id/GaButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="R"
             android:id="@+id/RiButton"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:layout_margin="0dp"
-            android:padding="8dp"
-            android:textSize="10dp"
+            style="@style/VoiceCoachSwaramButton"
             android:text="S"
             android:id="@+id/LSaButton"/>
     </LinearLayout>

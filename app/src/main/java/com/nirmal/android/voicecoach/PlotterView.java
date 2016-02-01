@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class PlotterView extends View {
     private static final String TAG = "Voice_Plotter";
-    private static final int POINT_WIDTH = 2;
+    private static final int POINT_WIDTH = 3;
     private static final int AXIS_OFFSET = 0;
 
     private static final double C0_Hz = 16.35f;
@@ -54,17 +54,17 @@ public class PlotterView extends View {
         mLoSaFreq = C0_Hz;
         mFreqPaint = new Paint();
         mFreqPaint.setStrokeWidth(POINT_WIDTH);
-        mFreqPaint.setColor(Color.CYAN);
+        mFreqPaint.setColor(0xff960000);
         mStairPaint = new Paint();
         mStairPaint.setStrokeWidth(POINT_WIDTH);
-        mStairPaint.setColor(Color.GREEN);
+        mStairPaint.setColor(0xffEFD090);
         mGridPaint = new Paint();
-        mGridPaint.setStrokeWidth(1);
+        mGridPaint.setStrokeWidth(2);
         mGridPaint.setStyle(Paint.Style.STROKE);
         mGridPaint.setPathEffect(new DashPathEffect(new float[]{15, 20, 15, 20}, 0));
-        mGridPaint.setColor(Color.YELLOW);
+        mGridPaint.setColor(0xffEFD090);
         mBackgroundPaint = new Paint();
-        mBackgroundPaint.setColor(Color.DKGRAY);
+        mBackgroundPaint.setColor(0x11EFD090); // 0xFFEFD090
     }
 
     private int getReferenceLineY(int h, int refLine) {
