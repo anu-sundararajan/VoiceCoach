@@ -19,6 +19,12 @@
         app:showAsAction="ifRoom|withText"/>
 
     <item
+        android:id="@+id/menu_item_thalam"
+        android:title="Thalam Speed"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:actionLayout="@layout/thalam_layout"/>
+
+    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"

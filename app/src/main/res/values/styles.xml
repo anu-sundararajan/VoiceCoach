@@ -8,6 +8,7 @@
         <item name="android:textColor">#ff960000</item>
         <item name="android:textColorPrimary">#ff960000</item>
         <item name="android:colorPrimaryDark">#ff860000</item>
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
 
     <style name="VoiceCoachOptionButton">
@@ -23,14 +24,19 @@
 
     <style name="VoiceCoachSwaramButton">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+
+        <item name="android:textSize">25dp</item>
+        <item name="android:textColor">#fffac090</item>
+        <item name="android:background">@drawable/red_metal_border</item>
+
         <item name="android:layout_margin">0dp</item>
         <item name="android:padding">3dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">0dp</item>
-        <item name="android:textSize">15dp</item>
-        <item name="android:textColor">#fffac090</item>
-        <item name="android:background">@drawable/red_metal_border</item>
+
     </style>
 
 </resources>
