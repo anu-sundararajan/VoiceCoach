@@ -25,7 +25,7 @@ public class PlotterView extends View {
     private static final int AXIS_OFFSET = 0;
 
     private static final double C0_Hz = 16.35f;
-    private static final double C_Exponent = 1;
+    private static final double C_Exponent = 3; //1;
 
     private Paint mFreqPaint;
     private Paint mGridPaint;

@@ -101,8 +101,8 @@ public class FFT {
         int span = m_N >> 1;        // Width of the butterfly
         int spacing = m_N;          // Distance between start of sub-FFTs
         int wIndexStep = 1;         // Increment for twiddle table index
-        int topNextIndex;
-        int botNextIndex;
+        int topIndex;
+        int botIndex;
 
         // Copy data into linked complex number objects
         // If it's an IFFT, we divide by N while we're at it
@@ -138,8 +138,8 @@ public class FFT {
             {
                 FFTElement xTop = m_X[start];
                 FFTElement xBot = m_X[start+span];
-                topNextIndex = start + 1;
-                botNextIndex = start + span + 1;
+                topIndex = start;
+                botIndex = start + span;
 
                 double wRe = 1.0;
                 double wIm = 0.0;
@@ -165,8 +165,10 @@ public class FFT {
                     xBot.im = xBotRe*wIm + xBotIm*wRe;
 
                     // Advance butterfly to next top & bottom positions
-                    if (topNextIndex < m_N) xTop = m_X[topNextIndex];
-                    if (botNextIndex < m_N) xBot = m_X[botNextIndex];
+                    topIndex++;
+                    botIndex++;
+                    if (topIndex < m_N) xTop = m_X[topIndex];
+                    if (botIndex < m_N) xBot = m_X[botIndex];
 
                     // Update the twiddle factor, via complex multiply
                     // by unit vector with the appropriate angle
@@ -200,13 +202,25 @@ public class FFT {
     public int calculateFrequency(int sampleRateInHz, short micData[]) {
         int i;
         // Get number of available input samples
-        int len = micData.length/4;
-
+        /******************************************************/
+        /******************************************************/
+        //int len = micData.length/4;
+        int len = micData.length;
+        /******************************************************/
+        /******************************************************/
+        int f = 0;
         // Read the input data and stuff it into the circular buffer
         for (i = 0; i < len; i++ )
         {
             // Convert the 16bit PCM data to float[-1,+1]
-            m_buf[m_writePos] = micData[i] / (float)32768;
+            //m_buf[m_writePos] = micData[i] / (float)32768;
+            /******************************************************/
+            /******************************************************/
+            m_buf[m_writePos] = sinewave[f];
+            f++;
+            f = f % 40;
+            /******************************************************/
+            /******************************************************/
             //Log.i(TAG, " micData = " + micData[i]);
             if( m_buf[m_writePos] > 1 ) m_buf[m_writePos] = 1;
             if( m_buf[m_writePos] < -1 ) m_buf[m_writePos] = -1;
@@ -226,7 +240,7 @@ public class FFT {
         }
 
         final double SCALE = 20/Math.log(10); //LN10
-        double max_mag = 0;
+        double max_mag = -Double.MAX_VALUE; //0; All the mags are negative so zero won't work.
         int bin_freq = sampleRateInHz/m_N;
         int freq = 0;
 
@@ -244,11 +258,18 @@ public class FFT {
             // Convert to dB magnitude
             // 20 log10(mag) => 20/ln(10) ln(mag)
             // Addition of MIN_VALUE prevents log from returning minus infinity if mag is zero
-            m_mag[i] = SCALE * Math.log10(sqrt + Double.MIN_VALUE);
+            // m_mag[i] = SCALE * Math.log10(sqrt + Double.MIN_VALUE);
+            if (sqrt == 0) {
+                m_mag[i] = SCALE * Math.log10(-Double.MAX_VALUE);
+                Log.i(TAG, "sqrt = 0, i = " + i + " mag = " + m_mag[i]);
+            }
+            else m_mag[i] = SCALE * Math.log10(sqrt);
+
             //Log.i(TAG, "re = " + re + " im = " + im + " prd = " + prd + " sqrt = " + sqrt + " mag[i] = " + m_mag[i]);
             //Identify greatest magnitude possible fundamental Frequency
             if (max_mag < m_mag[i]) {
                 max_mag = m_mag[i];
+                Log.i(TAG, "max mag = " + m_mag[i]);
                 // The FFT bins will correspond to frequencies that depend on the sample rate
                 // and the length of the FFT. For example, if you use a sample rate of 22050
                 // and a window with N=2048 (and logN=11), then the bin frequencies will be
@@ -282,5 +303,48 @@ public class FFT {
         }
         return y;
     }
+
+    private static final double[] sinewave = {
+            0,
+            0.156434581,
+            0.309017218,
+            0.453990813,
+            0.587785632,
+            0.707107196,
+            0.809017408,
+            0.891006897,
+            0.951056806,
+            0.987688506,
+            1,
+            0.987688139,
+            0.951056081,
+            0.891005832,
+            0.809016029,
+            0.707105537,
+            0.587783734,
+            0.453988723,
+            0.309014986,
+            0.156432263,
+            -2.34641E-06,
+            -0.156436898,
+            -0.309019449,
+            -0.453992904,
+            -0.58778753,
+            -0.707108855,
+            -0.809018787,
+            -0.891007962,
+            -0.951057531,
+            -0.987688873,
+            -1,
+            -0.987687772,
+            -0.951055356,
+            -0.891004767,
+            -0.80901465,
+            -0.707103878,
+            -0.587781835,
+            -0.453986632,
+            -0.309012754,
+            -0.156429946,
+    };
 
 }

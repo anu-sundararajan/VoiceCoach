@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MenuItem mPitchItem;
     MenuItem mSeqItem;
 
-    int sampleRateInHz = 44100; //11025;
+    int sampleRateInHz = 8000; //22050; //44100; //11025;
     int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
     boolean mIsRecording = false;
@@ -124,11 +124,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mStartStopButton = (Button)this.findViewById(R.id.StartStopButton);
         mStartStopButton.setOnClickListener(this);
         mThalamEditText = (EditText)this.findViewById(R.id.ThalamEditText);
+        mThalamEditText.setText(Integer.toString(AppData.getThalam(context)));
 
         mThalamEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Log.i(TAG, "on editor action " + actionId + "  " + event);
+                //Log.i(TAG, "on editor action " + actionId + "  " + event);
                 boolean handled = false;
                 if ((actionId == KeyEvent.KEYCODE_ENTER)||
                 (actionId == KeyEvent.KEYCODE_ENDCALL))
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mThalamEditText.setText(Integer.toString(ms_per_beat));
                         handled = true;
                     }
+                    AppData.setThalam(context, ms_per_beat);
                 }
                 return handled;
 
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mNumSamples = AudioRecord.getMinBufferSize(sampleRateInHz,
                 channelConfiguration, audioEncoding);
+
         Log.i(TAG, "mNumSamples = " + mNumSamples);
 
         populateRagams();
@@ -351,21 +354,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void startRecording() {
-        int ms_per_beat = 1000;
-        try {
-            ms_per_beat = Integer.parseInt(mThalamEditText.getText().toString());
-        } catch (Exception e) {
-            ms_per_beat = 1000;
-            Log.e(TAG, "NumberFormatException  - MS PER BEAT");
-            mThalamEditText.setText("1000");
-        }
 
         recordTask = new RecordAudio();
         recordTask.execute();
         if (AppData.getSequence(context) != 0) {
             int sampletime = (1000 * mNumSamples) / sampleRateInHz;
-            int swarakalam = ms_per_beat / sampletime;
-            Log.i(TAG, "ms_per_beat = " + ms_per_beat + "mNumSamples = " + mNumSamples + " Swarakalam = " + swarakalam);
+            int swarakalam = AppData.getThalam(context) / sampletime;
+            //Log.i(TAG, "ms_per_beat = " + ms_per_beat + "mNumSamples = " + mNumSamples + " Swarakalam = " + swarakalam);
             mFrequencyPlotterView.startReferenceStair(AppData.getSequence(context), swarakalam);
         }
 
